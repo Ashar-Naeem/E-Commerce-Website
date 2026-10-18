@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.container{
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
