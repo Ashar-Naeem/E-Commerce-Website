@@ -1,9 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { decrement } from "../Redux/counterSlicer";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/src/sweetalert2.scss';
+import { deleteCart } from "../Redux/CartSlice";
 
 const Cart = () => {
   const cart = useSelector((mydata) => mydata.cart.cart);
-  let dispatch = useDispatch();
+
+
   return (
 
     <section className="bg-white py-8 antialiased dark:bg-gray-900 md:py-16">
@@ -15,13 +18,13 @@ const Cart = () => {
           <div className="mx-auto w-full flex-none lg:max-w-2xl xl:max-w-4xl">
             <div className="space-y-6">
               {
-                cart.length>=1
-                ?
-                cart.map((cartObj,index)=> < CartRow key={index} cartObj={cartObj}/>)
-                :
-                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Cart is Empty
-                </h1>
+                cart.length >= 1
+                  ?
+                  cart.map((cartObj, index) => < CartRow key={index} cartObj={cartObj} />)
+                  :
+                  <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Cart is Empty
+                  </h1>
               }
             </div>
           </div>
@@ -147,9 +150,30 @@ export default Cart;
 
 
 
-export function CartRow({cartObj}) {
+export function CartRow({ cartObj }) {
+  let dispatch = useDispatch();
+  const deleteItem = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
 
-  console.log(cartObj)
+      if (result.isConfirmed) {
+        dispatch(deleteCart({ id: cartObj.id }))
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success"
+        });
+      }
+    });
+
+  }
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6">
       <div className="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
@@ -191,6 +215,7 @@ export function CartRow({cartObj}) {
               type="text"
               id="counter-input-5"
               data-input-counter=""
+              key={cartObj.quantity}
               className="w-10 shrink-0 border-0 bg-transparent text-center text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 dark:text-white"
               placeholder=""
               defaultValue={cartObj.quantity}
@@ -221,7 +246,7 @@ export function CartRow({cartObj}) {
           </div>
           <div className="text-end md:order-4 md:w-32">
             <p className="text-base font-bold text-gray-900 dark:text-white">
-             {cartObj.price}
+              {cartObj.quantity * cartObj.price}
             </p>
           </div>
         </div>
@@ -257,6 +282,8 @@ export function CartRow({cartObj}) {
               Add to Favorites
             </button>
             <button
+              onClick={deleteItem}
+
               type="button"
               className="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500"
             >
